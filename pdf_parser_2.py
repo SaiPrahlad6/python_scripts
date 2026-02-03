@@ -1,6 +1,7 @@
 import pdfplumber
 import pandas as pd
 import pyspark
+import tabula
 
 def extract_tables_pdfplumber(pdf_path):
     tables = []
@@ -23,15 +24,23 @@ def extract_tables_pdfplumber(pdf_path):
 
     return tables
 
+def extract_from_tabula(pdf_path):
+    # dfs = tabula.read_pdf(pdf_path,pages=1,stream=True)
+    dfs = tabula.read_pdf(pdf_path,pages=all)
+    return dfs
 
-tables = extract_tables_pdfplumber("sample_table.pdf")
+
+
+tables = extract_tables_pdfplumber("fully_reconstructed_matched_style.pdf")
 print(len(tables))
-print(tables[0])
+# print(tables[0])
 # Assuming a SparkSession named 'spark'
+# tables = extract_from_tabula("complex_exam.pdf")
 for tabl in tables:
-  spark_df = spark.createDataFrame(tabl["df"])
-  table_full_name = "main.default.my_new_table"   # Change to actual catalog information
-  spark_df.write.format("delta") \
-    .mode("overwrite") \
-    .saveAsTable(table_full_name)
+    print(tabl["df"].head(10))
+#   spark_df = spark.createDataFrame(tabl["df"])
+#   table_full_name = "main.default.my_new_table"   # Change to actual catalog information
+#   spark_df.write.format("delta") \
+#     .mode("overwrite") \
+#     .saveAsTable(table_full_name)
 
